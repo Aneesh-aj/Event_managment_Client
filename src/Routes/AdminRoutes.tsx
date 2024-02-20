@@ -12,6 +12,7 @@ function AdminRoutes(){
                 <Route path="/Requests" element={<AdminRequest/>}/>
                 <Route path="/login" element={< AdminLogin/>} />
                 <Route path="/RequestDetails" element={<RequestDetails/>} />
+                 
             </Routes>
 
         </>
