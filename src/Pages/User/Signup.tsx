@@ -1,9 +1,38 @@
 import React from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Link } from 'react-router-dom';
-
+import { useState } from 'react';
+import api from '../../Components/axios';
 
 const Signup: React.FC = () => {
+    
+    const [formData,setFormdata] = useState({
+        name :'',
+        email:'',
+        password: ''
+    })
+   
+   async function handler (e : React.FormEvent){
+        e.preventDefault();
+        const response = await api.post('/user/register', formData, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          console.log(response.data)
+    }
+
+    async function handlerchange(e : React.ChangeEvent){
+        const { name, value } = e.target as HTMLInputElement
+        setFormdata({
+            ...formData,
+            [name]: value,
+        });
+        console.log(formData)
+    }
+
+
     return (
         <div className='h-atuo overflow-y-scroll bg-[#f0f2f0] w-full flex justify-center custom-scrollbar'>
 
@@ -18,25 +47,25 @@ const Signup: React.FC = () => {
                     </button>
                 </div>
 
-                <form action="" className="my-10">
+                <form action="" onSubmit={handler} className="my-10">
                     <div className="flex flex-col space-y-5">
-                        <label htmlFor="password">
+                        <label htmlFor="name">
                             <p className="font-medium text-slate-700 pb-2">Name</p>
-                            <input id="password" name="password" type="password" className="w-full py-3 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow" placeholder="Enter your name" />
+                            <input id="name" onChange={handlerchange} name="name" type="text" className="w-full py-3 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow" placeholder="Enter your name" />
                         </label>
                         <label htmlFor="email">
                             <p className="font-medium text-slate-700 pb-2">Email address</p>
-                            <InputText keyfilter="email" id="email" name="email" className="w-full py-3 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow" placeholder="Enter email address" />
+                            <InputText onChange={handlerchange} keyfilter="email" id="email" name="email" className="w-full py-3 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow" placeholder="Enter email address" />
                         </label>
 
                         <label htmlFor="password">
                             <p className="font-medium text-slate-700 pb-2">Password</p>
-                            <input id="password" name="password" type="password" className="w-full py-3 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow" placeholder="Enter your password" />
+                            <input id="password" onChange={handlerchange} name="password" type="password" className="w-full py-3 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow" placeholder="Enter your password" />
                         </label>
-                        <label htmlFor="password">
+                        {/* <label htmlFor="password">
                             <p className="font-medium text-slate-700 pb-2">conform Password</p>
                             <input id="password" name="password" type="password" className="w-full py-3 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow" placeholder="Enter your password" />
-                        </label>
+                        </label> */}
 
                         <div className="flex flex-row justify-between">
                         </div>
