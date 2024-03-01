@@ -33,7 +33,7 @@ const Signup: React.FC = () => {
                 const response = await api.post('/user/createUser', values, {
                     headers: {
                         'Content-Type': 'application/json',
-                    },
+                    },withCredentials: true, 
                 })
                 .then((response)=>{
                      navigate("/user/")

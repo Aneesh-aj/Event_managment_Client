@@ -102,9 +102,37 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
     getCities();
   }, [selectedState, selectedCountry]);
 
+   console.log(ownerName,ownerId,email,phoneNumber,password,building,pincode,selectedCity,selectedCountry,selectedState,license,insurance,passbook)
+
+
   async function handler(e: React.FormEvent) {
-    e.preventDefault();
-    const response = await api.post('/user/register', FormData, {
+
+    const formData = new FormData();
+    formData.append("ownerName", ownerName);
+    formData.append("email", email);
+    formData.append("phoneNumber", phoneNumber);
+    formData.append("password", password);
+    formData.append("Cpassword", Cpassword);
+    formData.append("building", building);
+    formData.append("pincode", pincode);
+    formData.append("selectedCountry", selectedCountry || "");
+    formData.append("selectedState", selectedState || "");
+    formData.append("selectedCity", selectedCity || "");
+  
+    formData.append("ownerId", ownerId || "");
+    formData.append("license", license || "");
+    formData.append("insurance", insurance || "");
+    formData.append("passbook", passbook || "");
+
+    console.log("its the form datatassss",formData)
+
+
+
+
+
+    // e.preventDefault();
+    console.log("cominnngnsss")
+    const response = await api.post('/organizer/register', formData, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -262,11 +290,14 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
     if (Object.values(allerror).every((value) => value === "")) {
       console.log("entering");
       setPartTwo(false);
+       setShowotp(true)
     }
     console.log("after");
     setErrors(allerror)
   };
 
+
+  
 
   return (
     <div className='h-auto overflow-y-scroll bg-[#f0f2f0] w-full flex justify-center custom-scrollbar'>
@@ -341,7 +372,7 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
 
               </label>
 
-              <button onClick={validationOne}>next</button>
+              <button type='button' onClick={validationOne} className='bg-red-500'>next</button>
             </>
           )}
           {partTwo && (
@@ -430,9 +461,7 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
                   <FileUpload
                     mode="basic"
                     name="ownerId"
-                    url="/api/upload"
                     accept="image/*"
-                    maxFileSize={1000000}
                     onSelect={(e) => {
                       // e.files is an array of selected files
                       if (e.files.length > 0) {
@@ -450,12 +479,11 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
                 <p className="font-medium text-slate-700 pb-2">Company license </p>
                 <FileUpload
                   mode="basic"
-                  url="/api/upload"
                   accept="image/*"
                   id="license"
                   name="license"
-                  maxFileSize={1000000}
                   onSelect={(e) => {
+                    console.log("heyyyy-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->>>>>>>>>>",e.files[0].name)
                     // e.files is an array of selected files
                     if (e.files.length > 0) {
                       setLicense(e.files[0]);
@@ -473,10 +501,7 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
                     mode="basic"
                     id="insurance"
                     name="insurance"
-                    url="/api/upload"
-                    accept="image/*"
-                    maxFileSize={1000000}
-                    onSelect={(e) => {
+                                     onSelect={(e) => {
                       // e.files is an array of selected files
                       if (e.files.length > 0) {
                         setInsurance(e.files[0]);
@@ -490,32 +515,31 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
                 <label htmlFor="passbook" className='bg-yellow w-full'>
                   <p className="font-medium text-slate-700 pb-2">Bank passbook</p>
                   <FileUpload
-                    mode="basic"
+                    mode='basic'
                     id="passbook"
                     name="passbook"
-                    url="/api/upload"
                     accept="image/*"
-                    maxFileSize={1000000}
-                    onSelect={(e) => {
-                      // e.files is an array of selected files
-                      if (e.files.length > 0) {
-                        setPassbook(e.files[0]);
-                      }
-                    }}
+    onSelect={(e) => {
+      if (e.files.length > 0) {
+         setPassbook(e.files[0]);
+      }
+    }}
                     className="bg-white w-full h-12 overflow-hidden py-2 border border-black rounded-lg px-3 flex items-center focus:outline-none focus:border-slate-500 hover:shadow"
-                    chooseLabel="Choose file"
                   />
                   {errors.passbook && <div className="text-red-600 p-2">{errors.passbook}</div>}
                 </label>
               </div>
-              <button onClick={validationTwo}>next</button>
+              <button onClick={validationTwo} type='button' className="bg-green-300" >next</button>
             </>
           )}
 
           <div className="flex flex-row justify-between">
             <div></div>
           </div>
-          <button className="w-full py-3 font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg border-indigo-500 hover:shadow inline-flex space-x-2 items-center justify-center">
+          {
+            showOtp && <>
+                
+                <button type='submit' className="w-full py-3 font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg border-indigo-500 hover:shadow inline-flex space-x-2 items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"
@@ -532,6 +556,9 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
             </svg>
             <span>Register</span>
           </button>
+            
+            </>
+          }
           <p className="text-center">
             Already an Organizer?{' '}
             <a href="#" className="text-indigo-600 font-medium inline-flex space-x-1 items-center">
