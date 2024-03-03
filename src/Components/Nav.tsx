@@ -7,7 +7,7 @@ const  Nav:React.FC = ()=> {
         if (
             window.location.pathname === "/user/Login" ||
             window.location.pathname === "/user/Signup" ||
-            window.location.pathname === "/organizer/Registration/" ||
+            window.location.pathname === "/organizer/Register" ||
             window.location.pathname === "/orgnaizer/Login"||
             window.location.pathname === "/Admin/Login" 
         ) {

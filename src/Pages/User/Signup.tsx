@@ -36,7 +36,7 @@ const Signup: React.FC = () => {
                     },withCredentials: true, 
                 })
                 .then((response)=>{
-                     navigate("/user/")
+                     navigate("/userLogin")
                 })
             } catch (error) {
                 console.error('Registration failed:', error);
@@ -159,6 +159,7 @@ const Signup: React.FC = () => {
                              
                                 <button
                                     onClick={another}
+                                    type='button'
                                     className="w-full py-3 font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg border-indigo-500 hover:shadow inline-flex space-x-2 items-center justify-center">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -178,7 +179,7 @@ const Signup: React.FC = () => {
 
                                 <p className="text-center">
                             Already a user?{' '}
-                            <Link to="/user/Login" className="text-indigo-600 font-medium inline-flex space-x-1 items-center">
+                            <Link to="/userLogin" className="text-indigo-600 font-medium inline-flex space-x-1 items-center">
                                 <span>Login </span>
                                 <span>
                                     <svg

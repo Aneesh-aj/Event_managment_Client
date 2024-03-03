@@ -1,7 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const Home : React.FC=()=>{
+   const [role,setRole] = useState <string | null>("")
+
+  
+   useEffect(()=>{
+    const roleOfuser = localStorage.getItem("role");
+    console.log(roleOfuser);
+    setRole(roleOfuser); 
+       
+   })
+
     return(
       <>
       
@@ -81,7 +91,7 @@ const Home : React.FC=()=>{
                             backgroundPosition: 'center',
                           }}
                     >
-                      <Link to='/user/login'><button className="bg-blue-500 rounded-full p-1 px-2 font-semibold mb-2 text-white">Join as user</button></Link>
+                    {!role&&  <Link to='/signup'><button className="bg-blue-500 rounded-full p-1 px-2 font-semibold mb-2 text-white">Join as user</button></Link>}
                     </div>
 
                     <div className="w-[80%] mt-1 sm:w-1/3 doctor_bg bg-slate-600 rounded-md h-52 flex justify-center items-end"
@@ -91,9 +101,10 @@ const Home : React.FC=()=>{
                             backgroundPosition: 'center',
                           }}
                     >
-                      <Link to='/organizer/Registration'>
+                      {!role && 
+                      <Link to='/organizerRegister'>
                         <button className="bg-blue-500 rounded-full p-1 px-2 font-semibold mb-2 text-white">Join as Organizer</button>
-                      </Link>
+                      </Link>}
                     </div>
                   </div>
                 </div>

@@ -3,8 +3,10 @@ import { Country, State, City } from 'country-state-city';
 import { InputText } from 'primereact/inputtext';
 import { FileUpload } from 'primereact/fileupload';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../../Components/axios';
 import { ErrorMessage } from 'formik';
+import UploadImage from '../../Firebase/UploadImag';
 
 interface OrganizerRegistrationProps { }
 
@@ -31,6 +33,7 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>();
   const [selectedState, setSelectedState] = useState<string | undefined>();
   const [selectedCity, setSelectedCity] = useState<string | undefined>();
+  const navigate = useNavigate()
 
 
   const [ownerName, setOwnername] = useState<string>('');
@@ -38,6 +41,7 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [Cpassword, setCpassword] = useState<string>('');
+  const [otp , setOtp] = useState <string>('')
 
   const [building, setBuilding] = useState<string>('');
   const [pincode, setPincode] = useState<string>('');
@@ -45,6 +49,9 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
   const [license, setLicense] = useState<File | null>(null);
   const [insurance, setInsurance] = useState<File | null>(null);
   const [passbook, setPassbook] = useState<File | null>(null);
+
+  const formData = new FormData();
+
 
   const [errors, setErrors] = useState<Record<string, string | undefined>>({
     ownerName: '',
@@ -102,43 +109,68 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
     getCities();
   }, [selectedState, selectedCountry]);
 
-   console.log(ownerName,ownerId,email,phoneNumber,password,building,pincode,selectedCity,selectedCountry,selectedState,license,insurance,passbook)
+   
+
+
 
 
   async function handler(e: React.FormEvent) {
+    e.preventDefault()
 
-    const formData = new FormData();
-    formData.append("ownerName", ownerName);
+    formData.append("name", ownerName);
     formData.append("email", email);
     formData.append("phoneNumber", phoneNumber);
     formData.append("password", password);
     formData.append("Cpassword", Cpassword);
     formData.append("building", building);
     formData.append("pincode", pincode);
-    formData.append("selectedCountry", selectedCountry || "");
-    formData.append("selectedState", selectedState || "");
-    formData.append("selectedCity", selectedCity || "");
+    formData.append("country", selectedCountry || "");
+    formData.append("state", selectedState || "");
+    formData.append("city", selectedCity || "");
+    formData.append("otp",otp)
+
+     try{
+     
   
-    formData.append("ownerId", ownerId || "");
-    formData.append("license", license || "");
-    formData.append("insurance", insurance || "");
-    formData.append("passbook", passbook || "");
-
-    console.log("its the form datatassss",formData)
+    console.log("one ",formData)
 
 
+  const ownerIdUrls:any = await UploadImage(ownerId);
+  console.log("ownserIdUrls",ownerIdUrls)
+  const licenseUrls:any = await  UploadImage(license);
+  const insuranceUrls:any = await UploadImage(insurance);
+  const passbookUrls:any =  await UploadImage(passbook);
+  console.log(" afterr firevase uploead",ownerIdUrls, licenseUrls, insuranceUrls, passbookUrls);
+  console.log(" after lices",licenseUrls)
+  console.log(" after inus",insurance)
 
+  console.log('after passbookurl',passbookUrls)
 
+  
+  
+    formData.append('ownerId', ownerIdUrls ); // Assuming you want the first URL
+    formData.append('companyLicense', licenseUrls );
+    formData.append('companyInsurance', insuranceUrls);
+    formData.append('bankPassbook', passbookUrls)
+    
+  
+  
+      console.log("cominnngnsss")
+      const response = await api.post('/organizer/register', formData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then((response)=>{
+         navigate("/home")
+      })
 
-    // e.preventDefault();
-    console.log("cominnngnsss")
-    const response = await api.post('/organizer/register', formData, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    
+      console.log('response -->> ', response);
+      
+     }catch(error){
+          alert(error)
+     }
 
-    console.log(response.data);
   }
 
 
@@ -203,14 +235,14 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
       Newerrors.Cpassword = ""
     }
 
-    console.log("all eerros",Newerrors)
+    console.log("all eerros", Newerrors)
 
     if (Object.values(Newerrors).every((value) => value === "")) {
       console.log("entering");
       setPartOne(false);
       setPartTwo(true);
     }
-   console.log("after")
+    console.log("after")
     setErrors(Newerrors)
   };
 
@@ -222,7 +254,8 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
 
 
 
-  const validationTwo = () => {
+  const validationTwo = async(e:React.FormEvent) => {
+    e.preventDefault()
     let allerror = { ...errors };
 
     // Validate building
@@ -290,14 +323,32 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
     if (Object.values(allerror).every((value) => value === "")) {
       console.log("entering");
       setPartTwo(false);
-       setShowotp(true)
+      setShowotp(true)
+
+        console.log("entring here")
+        let emails = email
+        console.log("the email",email)
+        
+        const response = await api.post('/organizer/signup', { email: emails }, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        
+        
+
+      .then(()=>{
+        console.log(" the response",response)
+
+      })
+
     }
     console.log("after");
     setErrors(allerror)
   };
 
 
-  
+
 
   return (
     <div className='h-auto overflow-y-scroll bg-[#f0f2f0] w-full flex justify-center custom-scrollbar'>
@@ -344,7 +395,7 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
                   className="w-full py-3 border border-black rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow"
                   maxLength={14}
                 />
-                 {errors.phoneNumber && <div className="text-red-600 p-2">{errors.phoneNumber}</div>}
+                {errors.phoneNumber && <div className="text-red-600 p-2">{errors.phoneNumber}</div>}
               </label>
               <label htmlFor="password">
                 <p className="font-medium  mt-1 mb-1 text-slate-700 pb-2">Password</p>
@@ -356,7 +407,7 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
                   className="w-full py-3 border border-black rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow"
                   placeholder="Enter your password"
                 />
-                   {errors.password && <div className="text-red-600 p-2">{errors.password}</div>}
+                {errors.password && <div className="text-red-600 p-2">{errors.password}</div>}
               </label>
               <label htmlFor="Cpassword">
                 <p className="font-medium  mt-1 mb-1 text-slate-700 pb-2">conform Password</p>
@@ -368,7 +419,7 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
                   className="w-full py-3 border border-black rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow"
                   placeholder="Enter your password"
                 />
-                 {errors.Cpassword && <div className="text-red-600 p-2">{errors.Cpassword}</div>}
+                {errors.Cpassword && <div className="text-red-600 p-2">{errors.Cpassword}</div>}
 
               </label>
 
@@ -483,7 +534,7 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
                   id="license"
                   name="license"
                   onSelect={(e) => {
-                    console.log("heyyyy-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->>>>>>>>>>",e.files[0].name)
+                    console.log("heyyyy-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->>>>>>>>>>", e.files[0].name)
                     // e.files is an array of selected files
                     if (e.files.length > 0) {
                       setLicense(e.files[0]);
@@ -501,7 +552,7 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
                     mode="basic"
                     id="insurance"
                     name="insurance"
-                                     onSelect={(e) => {
+                    onSelect={(e) => {
                       // e.files is an array of selected files
                       if (e.files.length > 0) {
                         setInsurance(e.files[0]);
@@ -519,17 +570,17 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
                     id="passbook"
                     name="passbook"
                     accept="image/*"
-    onSelect={(e) => {
-      if (e.files.length > 0) {
-         setPassbook(e.files[0]);
-      }
-    }}
+                    onSelect={(e) => {
+                      if (e.files.length > 0) {
+                        setPassbook(e.files[0]);
+                      }
+                    }}
                     className="bg-white w-full h-12 overflow-hidden py-2 border border-black rounded-lg px-3 flex items-center focus:outline-none focus:border-slate-500 hover:shadow"
                   />
                   {errors.passbook && <div className="text-red-600 p-2">{errors.passbook}</div>}
                 </label>
               </div>
-              <button onClick={validationTwo} type='button' className="bg-green-300" >next</button>
+              <button onClick={(e)=>validationTwo(e)} type='button' className="bg-green-300" >next</button>
             </>
           )}
 
@@ -538,32 +589,46 @@ const OrganizerRegistration: React.FC<OrganizerRegistrationProps> = () => {
           </div>
           {
             showOtp && <>
-                
-                <button type='submit' className="w-full py-3 font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg border-indigo-500 hover:shadow inline-flex space-x-2 items-center justify-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
-              />
-            </svg>
-            <span>Register</span>
-          </button>
-            
+               
+               <label htmlFor="Cpassword">
+                <p className="font-medium  mt-1 mb-1 text-slate-700 pb-2">conform Password</p>
+                <input
+                  id="otp"
+                  name="otp"
+                  type="text"
+                  onChange={(e) => setOtp(e.target.value)}
+                  className="w-full py-3 border border-black rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow"
+                  placeholder="Enter your password"
+                />
+                {errors.Cpassword && <div className="text-red-600 p-2">{errors.Cpassword}</div>}
+
+              </label>
+
+              <button type='submit' className="w-full py-3 font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg border-indigo-500 hover:shadow inline-flex space-x-2 items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                  />
+                </svg>
+                <span>Register</span>
+              </button>
+
             </>
           }
           <p className="text-center">
             Already an Organizer?{' '}
             <a href="#" className="text-indigo-600 font-medium inline-flex space-x-1 items-center">
               {' '}
-              <Link to='/organizer/Login'>
+              <Link to='/organizerLogin'>
                 <span>Login </span>
               </Link>{' '}
               <span>

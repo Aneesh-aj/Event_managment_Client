@@ -1,17 +1,19 @@
-import {  Route, Routes } from "react-router-dom";
-import Signup from "../Pages/User/Signup";
-import Login from "../Pages/User/Login";
+import { Route, Routes } from "react-router-dom"
+import UserProcted from "./protectedRoute/UserProtect"
+import Home from "../Pages/Home"
+import Errorpage from "../Components/404page"
 
-function UserRoutes(){
-    return(
-        <>
-             <Routes>
-                <Route path="/Signup" element={<Signup/>}   />
-                <Route path="/Login" element={<Login/>}   />
 
-             </Routes>
-        </>
+function UserRoute (){
+    return (
+        <Routes>
+             <Route element={<UserProcted/>}>
+                    <Route path="/home" element={<Home/>} />
+                    <Route path="*" element={<Errorpage/>} />
+             </Route>
+        </Routes>
     )
 }
 
-export default UserRoutes
+export default UserRoute
+
